@@ -165,7 +165,7 @@ function App(props) {
                             const p = new Promise((resolve, reject) => {
                               axios.post('/api/homework/submit', { id: formData.id, key: window.location.href.split('/')[3], current, data: { name: step.title + '/' + name + ext } }).then((res) => {
                                 uploadUrlRef.current = res.data.url;
-                                resolve(res.data.url);
+                                resolve(file);
                               }).catch((err) => {
                                 message.error(err.message);
                                 console.error(err);
@@ -173,6 +173,24 @@ function App(props) {
                               });
                             });
                             return p;
+                          }
+                        }
+                        customRequest={
+                          (e) => {
+                            const { action, file, onError, onProgress, onSuccess } = e
+                            axios.put(action, file, {
+                              headers: { 'Content-Type': file.type },
+                              onUploadProgress: (ev) => {
+                                const percent = ((ev.loaded / ev.total) * 100) | 0;
+                                onProgress({ percent }, file);
+                              },
+                            }).then(() => {
+                              onSuccess(file);
+                            },
+                              (res) => {
+                                onError(res);
+                              },
+                            );
                           }
                         }
                         onChange={
@@ -230,7 +248,7 @@ function App(props) {
         }
       </Content>
       <Footer style={{ textAlign: 'center' }}>
-        作业提交系统  @2022 Crafted with ❤ by <a href="http://d1.fan" target="_blank" rel="noreferrer">xjzsq </a>,
+        作业提交系统  @2022 Crafted with ❤ by <a href="https://xjzsq.cn" target="_blank" rel="noreferrer">xjzsq </a>,
         Powered by <a href="https://reactjs.org/" target="_blank" rel="noreferrer"> React </a >
       </Footer >
     </Layout >
